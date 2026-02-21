@@ -24,22 +24,32 @@ Athena queries data directly from S3
 SNS sends alert if stock crosses threshold
 
 📂 Project Structure
+
 real-time-stock-analytics-aws/
 │
 ├── lambda/
-│   └── lambda_function.py
+│   ├── lambda_function.py
+│   └── requirements.txt
 │
 ├── athena/
 │   └── create_table.sql
 │
+├── docs/
+│   └── architecture-diagram.png
+│
+├── screenshots/
+│   └── athena-query-result.png
+│
 ├── README.md
 └── .gitignore
 📊 Sample Athena Queries
+
 SELECT AVG(c) AS avg_price FROM stock_data;
 
 SELECT MAX(h) AS highest_price FROM stock_data;
 
 SELECT MIN(l) AS lowest_price FROM stock_data;
+
 ⚙️ Setup Instructions
 
 Create S3 bucket
@@ -54,6 +64,7 @@ Add EventBridge schedule (rate 5 minutes)
 
 Configure Athena external table
 
+
 🔐 Security Best Practices
 
 API key stored as Lambda Environment Variable
@@ -64,6 +75,7 @@ IAM role-based access control
 
 Serverless architecture (no EC2 dependency)
 
+
 💰 Cost Optimization
 
 Fully serverless (pay-per-use model)
@@ -73,6 +85,7 @@ Free tier compatible
 Minimal data scanned in Athena
 
 Estimated cost: < $2/month for demo usage
+
 
 🎯 Key Skills Demonstrated
 
