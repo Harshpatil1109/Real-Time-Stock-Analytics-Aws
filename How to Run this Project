@@ -1,0 +1,225 @@
+How to Run this Project Steps-by-Steps: 
+
+We are using:
+
+AWS Lambda
+
+Amazon S3
+
+Amazon DynamoDB
+
+Amazon SNS
+
+Amazon EventBridge
+
+Amazon Athena
+
+
+COMPLETE STEP-BY-STEP: Run the Project
+STEP 1: Create S3 Bucket
+
+Open AWS Console
+
+Go to S3
+
+Click Create bucket
+
+Name:
+
+real-time-stock-analytics-yourname
+
+Create bucket
+
+Inside bucket → Create folder:
+
+raw-data/
+
+STEP 2: Create DynamoDB Table
+
+Go to DynamoDB
+
+Click Create table
+
+Table name:
+
+stock_prices
+
+Partition key:
+
+symbol (String)
+
+Create table
+
+STEP 3: Create SNS Topic (For Alerts)
+
+Go to SNS
+
+Create Topic → Standard
+
+Name:
+
+stock-alert-topic
+
+Create subscription:
+
+Protocol: Email
+
+Enter your email
+
+Confirm email subscription
+
+Copy the Topic ARN (you’ll need it).
+
+
+STEP 4: Get API Key
+
+Go to Finnhub.io
+Create free account
+Copy API key
+
+STEP 5: Create IAM Role for Lambda
+
+Go to IAM → Roles → Create Role
+
+Trusted entity:
+
+Lambda
+
+Attach policies:
+
+AmazonS3FullAccess
+
+AmazonDynamoDBFullAccess
+
+AmazonSNSFullAccess
+
+AWSLambdaBasicExecutionRole
+
+Name:
+
+lambda-stock-role
+
+STEP 6: Create Lambda Function
+
+Go to Lambda
+
+Create function
+
+Name:
+
+stock-processor
+
+Runtime: Python 3.10
+
+Choose role: lambda-stock-role
+
+🔧 Configure Environment Variables (Important)
+
+In Lambda → Configuration → Environment variables:
+
+Add:
+
+API_KEY = your_actual_api_key
+BUCKET_NAME = real-time-stock-analytics-yourname
+TABLE_NAME = stock_prices
+SNS_TOPIC_ARN = your_sns_topic_arn
+
+STEP 7: Upload Lambda Code
+
+Open lambda_function.py
+
+Paste your code
+
+Click Deploy
+
+STEP 8: Test Lambda Manually (Before Automation)
+
+Click Test
+
+Create test event (default JSON is fine)
+
+Click Test
+
+If successful:
+
+StatusCode = 200
+
+No errors
+
+STEP 9: Check If Data is Stored
+
+After testing:
+
+✔ Check S3
+
+Open bucket → raw-data
+You should see JSON files.
+
+✔ Check DynamoDB
+
+Open table → Explore items
+You should see stock price row.
+
+✔ Check Email
+
+If price > threshold → SNS email sent.
+
+
+STEP 10: Automate Using EventBridge
+
+Open EventBridge
+
+Create Rule
+
+Choose Schedule
+
+Rate-based expression:
+
+rate(5 minutes)
+
+Target:
+
+Lambda → stock-processor
+
+Create rule
+
+Now it runs automatically every 5 minutes.
+
+
+STEP 11: Configure Athena
+
+Open Athena
+
+Set query result location (choose your S3 bucket)
+
+Run:
+
+CREATE DATABASE stockdb;
+
+Then:
+
+CREATE EXTERNAL TABLE stock_data (
+  c double,
+  h double,
+  l double,
+  o double,
+  pc double
+)
+ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
+LOCATION 's3://real-time-stock-analytics-yourname/raw-data/';
+
+Now test:
+
+SELECT * FROM stock_data;
+
+If rows appear → Project is running successfully 🎉
+
+🎯 How To Confirm Project Is Fully Running
+
+✔ Lambda logs updating every 5 min
+✔ S3 files increasing
+✔ DynamoDB updating
+✔ Athena query returning results
+✔ SNS alert working
+
+If all 5 working → System is LIVE 🚀
