@@ -1,5 +1,5 @@
-📈 AWS Real-Time Stock Analytics (Serverless Architecture)
-🚀 Project Overview
+
+📈 AWS Real-Time Stock Analytics (Serverless Architecture) 🚀 Project Overview
 
 This project implements a fully serverless real-time stock analytics pipeline using AWS cloud services. The system ingests live stock market data, stores it in scalable storage layers, performs SQL-based analytics, and triggers real-time alerts based on threshold conditions.
 
