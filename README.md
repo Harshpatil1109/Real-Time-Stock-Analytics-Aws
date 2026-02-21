@@ -7,21 +7,7 @@ The architecture is event-driven, cost-efficient, and production-ready.
 
 🏗️ Architecture
 
-Services Used:
-
-AWS Lambda – Data ingestion & processing
-
-Amazon S3 – Raw data storage
-
-Amazon DynamoDB – Latest price storage
-
-Amazon Athena – SQL analytics on S3
-
-Amazon SNS – Email alerts
-
-Amazon EventBridge – Scheduled trigger
-
-Amazon CloudWatch – Logging & monitoring
+<img width="7418" height="2057" alt="Image" src="https://github.com/user-attachments/assets/a0e95589-bd7c-4d16-90e2-425f1e094add" />
 
 🔄 Workflow
 
