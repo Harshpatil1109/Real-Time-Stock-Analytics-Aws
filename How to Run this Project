@@ -1,203 +1,122 @@
-How to Run this Project Steps-by-Steps: 
+## 🚀 How to Run the Project
 
-We are using:
+### ☁️ AWS Services Used
 
-AWS Lambda
+* AWS Lambda
+* Amazon S3
+* Amazon DynamoDB
+* Amazon SNS
+* Amazon EventBridge
+* Amazon Athena
+* Finnhub API
 
-Amazon S3
+### 🛠️ Setup Steps
 
-Amazon DynamoDB
+**1. Create an S3 Bucket**
 
-Amazon SNS
+* Open **AWS Console → S3**
+* Create a bucket: `real-time-stock-analytics-yourname`
+* Create a folder inside the bucket: `raw-data/`
 
-Amazon EventBridge
+**2. Create DynamoDB Table**
 
-Amazon Athena
+* Go to **DynamoDB → Create Table**
+* Table Name: `stock_prices`
+* Partition Key: `symbol` (String)
 
+**3. Configure SNS Alerts**
 
-COMPLETE STEP-BY-STEP: Run the Project
-STEP 1: Create S3 Bucket
+* Go to **SNS → Create Topic**
+* Topic Type: `Standard`
+* Topic Name: `stock-alert-topic`
+* Create an **Email subscription**
+* Confirm the subscription from your email
+* Copy the **SNS Topic ARN**
 
-Open AWS Console
+**4. Get Finnhub API Key**
 
-Go to S3
+* Create an account on **Finnhub**
+* Generate/copy your API key
+* Keep it ready for the Lambda environment variables
 
-Click Create bucket
+**5. Create IAM Role for Lambda**
 
-Name:
+* Go to **IAM → Roles → Create Role**
+* Trusted Entity: **AWS Lambda**
+* Attach the required permissions for:
 
-real-time-stock-analytics-yourname
+  * Amazon S3
+  * DynamoDB
+  * SNS
+  * CloudWatch Logs
+* Role Name: `lambda-stock-role`
 
-Create bucket
+> For production, replace broad access policies with least-privilege permissions.
 
-Inside bucket → Create folder:
+**6. Create Lambda Function**
 
-raw-data/
+* Go to **AWS Lambda → Create Function**
+* Function Name: `stock-processor`
+* Runtime: **Python**
+* Select the IAM role created above
 
-STEP 2: Create DynamoDB Table
+Add these environment variables:
 
-Go to DynamoDB
+```text
+API_KEY=your_finnhub_api_key
+BUCKET_NAME=real-time-stock-analytics-yourname
+TABLE_NAME=stock_prices
+SNS_TOPIC_ARN=your_sns_topic_arn
+```
 
-Click Create table
+**7. Upload Lambda Code**
 
-Table name:
+* Open `lambda_function.py`
+* Add the project code
+* Upload/deploy it to the Lambda function
 
-stock_prices
+**8. Test the Lambda Function**
 
-Partition key:
+* Create a test event
+* Run the function manually
+* Verify that the Lambda execution completes successfully
+* Check **CloudWatch Logs** for errors
 
-symbol (String)
+**9. Verify Data Storage**
+After a successful execution, verify:
 
-Create table
+* 📦 **S3:** JSON files appear inside `raw-data/`
+* 🗄️ **DynamoDB:** Stock price records are added
+* 📧 **SNS:** Alert email is received when the configured threshold is triggered
 
-STEP 3: Create SNS Topic (For Alerts)
+**10. Automate with EventBridge**
 
-Go to SNS
+* Open **Amazon EventBridge**
+* Create a scheduled rule
+* Schedule expression:
 
-Create Topic → Standard
-
-Name:
-
-stock-alert-topic
-
-Create subscription:
-
-Protocol: Email
-
-Enter your email
-
-Confirm email subscription
-
-Copy the Topic ARN (you’ll need it).
-
-
-STEP 4: Get API Key
-
-Go to Finnhub.io
-Create free account
-Copy API key
-
-STEP 5: Create IAM Role for Lambda
-
-Go to IAM → Roles → Create Role
-
-Trusted entity:
-
-Lambda
-
-Attach policies:
-
-AmazonS3FullAccess
-
-AmazonDynamoDBFullAccess
-
-AmazonSNSFullAccess
-
-AWSLambdaBasicExecutionRole
-
-Name:
-
-lambda-stock-role
-
-STEP 6: Create Lambda Function
-
-Go to Lambda
-
-Create function
-
-Name:
-
-stock-processor
-
-Runtime: Python 3.10
-
-Choose role: lambda-stock-role
-
-🔧 Configure Environment Variables (Important)
-
-In Lambda → Configuration → Environment variables:
-
-Add:
-
-API_KEY = your_actual_api_key
-BUCKET_NAME = real-time-stock-analytics-yourname
-TABLE_NAME = stock_prices
-SNS_TOPIC_ARN = your_sns_topic_arn
-
-STEP 7: Upload Lambda Code
-
-Open lambda_function.py
-
-Paste your code
-
-Click Deploy
-
-STEP 8: Test Lambda Manually (Before Automation)
-
-Click Test
-
-Create test event (default JSON is fine)
-
-Click Test
-
-If successful:
-
-StatusCode = 200
-
-No errors
-
-STEP 9: Check If Data is Stored
-
-After testing:
-
-✔ Check S3
-
-Open bucket → raw-data
-You should see JSON files.
-
-✔ Check DynamoDB
-
-Open table → Explore items
-You should see stock price row.
-
-✔ Check Email
-
-If price > threshold → SNS email sent.
-
-
-STEP 10: Automate Using EventBridge
-
-Open EventBridge
-
-Create Rule
-
-Choose Schedule
-
-Rate-based expression:
-
+```text
 rate(5 minutes)
+```
 
-Target:
+* Target: `stock-processor` Lambda
+* Create the rule
 
-Lambda → stock-processor
+The Lambda function will now execute automatically every 5 minutes.
 
-Create rule
+**11. Configure Amazon Athena**
 
-Now it runs automatically every 5 minutes.
+* Open **Amazon Athena**
+* Configure the S3 query result location
+* Create the database:
 
-
-STEP 11: Configure Athena
-
-Open Athena
-
-Set query result location (choose your S3 bucket)
-
-Run:
-
+```sql
 CREATE DATABASE stockdb;
+```
 
-Then:
+* Create the external table:
 
+```sql
 CREATE EXTERNAL TABLE stock_data (
   c double,
   h double,
@@ -207,19 +126,42 @@ CREATE EXTERNAL TABLE stock_data (
 )
 ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
 LOCATION 's3://real-time-stock-analytics-yourname/raw-data/';
+```
 
-Now test:
+* Test the data:
 
+```sql
 SELECT * FROM stock_data;
+```
 
-If rows appear → Project is running successfully 🎉
+### ✅ Project Verification
 
-🎯 How To Confirm Project Is Fully Running
+The project is working when:
 
-✔ Lambda logs updating every 5 min
-✔ S3 files increasing
-✔ DynamoDB updating
-✔ Athena query returning results
-✔ SNS alert working
+* ✅ Lambda executes successfully
+* ✅ EventBridge triggers Lambda every 5 minutes
+* ✅ S3 receives stock data
+* ✅ DynamoDB stores stock records
+* ✅ SNS sends threshold alerts
+* ✅ Athena successfully queries the stored data
 
-If all 5 working → System is LIVE 🚀
+### 🎯 Architecture Flow
+
+```text
+Finnhub API
+     ↓
+AWS Lambda
+     ↓
+ ┌───┴───────────────┐
+ ↓                   ↓
+S3              DynamoDB
+ ↓
+Athena
+
+Lambda → SNS → Email Alert
+   ↑
+EventBridge
+(Every 5 Minutes)
+```
+
+> 🚀 **Result:** A serverless real-time stock analytics pipeline that automatically collects stock data, stores it in AWS, analyzes it with Athena, and sends alerts through SNS.
