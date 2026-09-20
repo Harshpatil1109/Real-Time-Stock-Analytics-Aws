@@ -7,7 +7,8 @@ The architecture is event-driven, cost-efficient, and production-ready.
 
 🏗️ Architecture
 
-<img width="7418" height="2057" alt="Image" src="https://github.com/user-attachments/assets/a0e95589-bd7c-4d16-90e2-425f1e094add" />
+<img width="1774" height="887" alt="ChatGPT Image Sep 20, 2026, 05_57_58 PM" src="https://github.com/user-attachments/assets/ac65060d-d4bb-4e91-8046-e69dc4fbf31c" />
+
 
 🔄 Workflow
 
